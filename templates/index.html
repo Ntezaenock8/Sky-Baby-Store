@@ -1,0 +1,470 @@
+{% extends 'base.html' %}
+{% block title %}Sky Baby Store — Home{% endblock %}
+
+{% block content %}
+
+<!-- ── HERO ─────────────────────────────────────────────── -->
+<div class="hero text-center">
+    <div class="container">
+        <h1>The Parent's Partner</h1>
+        <p>For Their First Everything; products curated just for them.</p>
+        <a href="#products" class="btn btn-warning btn-lg px-5">
+            Shop Now <i class="bi bi-arrow-down ms-2"></i>
+        </a>
+    </div>
+</div>
+
+<!-- ── CATEGORY FILTER ──────────────────────────────────── -->
+<section id="products" class="mb-5">
+    <div id="filter-section" class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <h2 class="fw-bold mb-0">Our Products</h2>
+        
+        <!-- Category Filter Buttons -->
+        <div class="category-filter d-flex flex-wrap gap-2">
+            <button class="btn btn-sm btn-warning category-btn" data-category="">
+                All Products
+            </button>
+            {% for cat in categories %}
+                <button class="btn btn-sm btn-outline-secondary category-btn" data-category="{{ cat['category'] }}">
+                    {{ cat['category'] }}
+                </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loading-indicator" style="display: none; text-align: center; padding: 20px;">
+        <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- ── PRODUCTS GRID ───────────────────────────────────── -->
+    <div id="products-container">
+    {% if products %}
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for product in products %}
+            <div class="col">
+                <div class="card product-card h-100">
+                    <!-- Image Carousel -->
+                    {% set images = product.get('images', []) %}
+                    {% if images and images[0] and images[0]['image_url'] %}
+                        <div class="product-image-carousel position-relative">
+                            <div class="carousel-container" style="position: relative; width: 100%; height: 220px; overflow: hidden; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                                {% for img in images %}
+                                    {% if img['image_url'] %}
+                                        <img src="{{ img['image_url'] }}" alt="{{ product['name'] }}" 
+                                             class="carousel-image" 
+                                             style="width: 100%; height: 100%; object-fit: contain; {% if loop.index0 == 0 %}display: block;{% else %}display: none;{% endif %} position: absolute; top: 0; left: 0; cursor: pointer;"
+                                             onclick="openImageModal(this)">
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <!-- Carousel Navigation Arrows -->
+                            {% if images|length > 1 %}
+                                <button class="btn btn-sm btn-light position-absolute start-0 top-50 translate-middle-y ms-2" 
+                                        onclick="previousImage(this)" 
+                                        style="z-index: 10; opacity: 0.8; transition: all 0.3s;"
+                                        onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'"
+                                        onmouseout="this.style.opacity='0.8'; this.style.transform='scale(1)'">
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+                                <button class="btn btn-sm btn-light position-absolute end-0 top-50 translate-middle-y me-2" 
+                                        onclick="nextImage(this)" 
+                                        style="z-index: 10; opacity: 0.8; transition: all 0.3s;"
+                                        onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'"
+                                        onmouseout="this.style.opacity='0.8'; this.style.transform='scale(1)'">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+                            {% endif %}
+
+                            <!-- Image Navigation Dots -->
+                            {% if images|length > 1 %}
+                                <div class="carousel-dots position-absolute bottom-0 start-50 translate-middle-x pb-2 d-flex gap-2">
+                                    {% for img in images %}
+                                        {% if img['image_url'] %}
+                                            <span class="dot {% if loop.index0 == 0 %}active{% endif %}" 
+                                                  onclick="changeImage(this)" 
+                                                  style="width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.3s; border: 2px solid white;"></span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <!-- Action Tag Badge -->
+                            {% if product['action'] %}
+                                <span class="badge bg-danger position-absolute top-0 end-0 m-2">{{ product['action'] }}</span>
+                            {% endif %}
+
+                            <!-- Product Link -->
+                            <a href="{{ url_for('product', product_id=product['id']) }}" class="stretched-link"></a>
+                        </div>
+                    {% else %}
+                        <div class="product-image-carousel position-relative" style="background: #e9ecef; min-height: 220px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #dee2e6;">
+                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+
+                    <!-- Product Info -->
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title fw-semibold">{{ product['name'] }}</h6>
+                        
+                        <!-- Pricing -->
+                        <div class="mb-2">
+                            {% if product['discount'] and product['discount']|float > 0 %}
+                                <p class="price mb-1">
+                                    UGX {{ "{:,.0f}".format(product['price'] - (product['price'] * product['discount'] / 100)) }}
+                                </p>
+                                <small class="text-muted text-decoration-line-through">UGX {{ "{:,.0f}".format(product['price']) }}</small>
+                                <span class="badge bg-danger ms-2">-{{ product['discount']|int }}%</span>
+                            {% else %}
+                                <p class="price mb-0">UGX {{ "{:,.0f}".format(product['price']) }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Category Badge -->
+                        <p class="mb-2"><span class="badge bg-light text-dark small">{{ product['category'] }}</span></p>
+
+                        <!-- Stock Status & Button -->
+                        {% if session.get('role') == 'admin' %}
+                            <a href="{{ url_for('edit_product', product_id=product['id']) }}"
+                               class="btn btn-warning btn-sm mt-auto">
+                                <i class="bi bi-pencil-square me-1"></i>Edit Product
+                            </a>
+                        {% elif product['stock'] > 0 %}
+                            <span class="badge bg-success mb-2" style="width:fit-content">In Stock</span>
+                            <a href="{{ url_for('add_to_cart', product_id=product['id']) }}"
+                               class="btn btn-primary btn-sm mt-auto">
+                                <i class="bi bi-cart-plus me-1"></i>Add to Cart
+                            </a>
+                        {% else %}
+                            <span class="badge bg-danger mb-2" style="width:fit-content">Out of Stock</span>
+                            <button class="btn btn-secondary btn-sm mt-auto" disabled>Unavailable</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <!-- No products for this category -->
+        <div class="text-center py-5">
+            <i class="bi bi-box-seam display-1 text-muted"></i>
+            <p class="text-muted mt-3">No products available in this category.</p>
+        </div>
+    {% endif %}
+    </div><!-- Close products-container -->
+
+</section>
+
+<!-- ── IMAGE MODAL ──────────────────────────────────– -->
+<div id="imageModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center; flex-direction: column;">
+    <button id="closeModalBtn" onclick="closeImageModal()" style="position: absolute; top: 20px; right: 30px; background: none; border: none; color: white; font-size: 40px; cursor: pointer; z-index: 2001; padding: 0; width: 50px; height: 50px;">&times;</button>
+    <img id="modalImage" src="" alt="" style="max-width: 90%; max-height: 85vh; object-fit: contain; border-radius: 8px;">
+    <div id="imageCounter" style="color: white; margin-top: 20px; font-size: 16px; text-align: center;"></div>
+</div>
+
+<!-- ── CAROUSEL SCRIPT ──────────────────────────────────– -->
+<script>
+function openImageModal(imgElement) {
+    // Get current image src
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const counter = document.getElementById('imageCounter');
+    
+    // Use setTimeout to ensure modal is visible before setting src
+    modal.style.display = 'flex';
+    setTimeout(() => {
+        modalImg.src = imgElement.src;
+    }, 10);
+    
+    // Get carousel context to show image number
+    const carousel = imgElement.closest('.carousel-container');
+    const images = carousel.querySelectorAll('.carousel-image');
+    let currentIndex = 0;
+    for (let i = 0; i < images.length; i++) {
+        if (images[i].style.display === 'block') {
+            currentIndex = i + 1;
+            break;
+        }
+    }
+    
+    if (images.length > 1) {
+        counter.textContent = `Image ${currentIndex} of ${images.length}`;
+    } else {
+        counter.textContent = '';
+    }
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.style.display = 'none';
+}
+
+// Initialize modal event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    
+    // Close on backdrop click (click on modal container, not on image)
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal || e.target === document.getElementById('imageCounter')) {
+            closeImageModal();
+        }
+    });
+    
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.display === 'flex') {
+            closeImageModal();
+        }
+    });
+});
+
+function changeImage(dot) {
+    // Get the carousel container from parent
+    const carousel = dot.closest('.carousel-dots').closest('.product-image-carousel').querySelector('.carousel-container');
+    const images = carousel.querySelectorAll('.carousel-image');
+    const dots = dot.parentElement.querySelectorAll('.dot');
+    
+    // Find which dot was clicked
+    let imageIndex = 0;
+    for (let i = 0; i < dots.length; i++) {
+        if (dots[i] === dot) {
+            imageIndex = i;
+            break;
+        }
+    }
+    
+    // Hide all images and remove active class from dots
+    images.forEach(img => img.style.display = 'none');
+    dots.forEach(d => d.style.background = 'rgba(255,255,255,0.7)');
+    
+    // Show selected image and highlight dot
+    images[imageIndex].style.display = 'block';
+    dot.style.background = 'rgba(255,255,255,1)';
+}
+
+function nextImage(button) {
+    // Get carousel and images
+    const carousel = button.closest('.product-image-carousel').querySelector('.carousel-container');
+    const images = carousel.querySelectorAll('.carousel-image');
+    const dotsContainer = button.closest('.product-image-carousel').querySelector('.carousel-dots');
+    const dots = dotsContainer.querySelectorAll('.dot');
+    
+    // Find current image
+    let currentIndex = 0;
+    for (let i = 0; i < images.length; i++) {
+        if (images[i].style.display === 'block') {
+            currentIndex = i;
+            break;
+        }
+    }
+    
+    // Go to next image (loop to first if at end)
+    let nextIndex = (currentIndex + 1) % images.length;
+    
+    // Update display
+    images.forEach(img => img.style.display = 'none');
+    dots.forEach(d => d.style.background = 'rgba(255,255,255,0.7)');
+    
+    images[nextIndex].style.display = 'block';
+    dots[nextIndex].style.background = 'rgba(255,255,255,1)';
+}
+
+function previousImage(button) {
+    // Get carousel and images
+    const carousel = button.closest('.product-image-carousel').querySelector('.carousel-container');
+    const images = carousel.querySelectorAll('.carousel-image');
+    const dotsContainer = button.closest('.product-image-carousel').querySelector('.carousel-dots');
+    const dots = dotsContainer.querySelectorAll('.dot');
+    
+    // Find current image
+    let currentIndex = 0;
+    for (let i = 0; i < images.length; i++) {
+        if (images[i].style.display === 'block') {
+            currentIndex = i;
+            break;
+        }
+    }
+    
+    // Go to previous image (loop to last if at beginning)
+    let prevIndex = (currentIndex - 1 + images.length) % images.length;
+    
+    // Update display
+    images.forEach(img => img.style.display = 'none');
+    dots.forEach(d => d.style.background = 'rgba(255,255,255,0.7)');
+    
+    images[prevIndex].style.display = 'block';
+    dots[prevIndex].style.background = 'rgba(255,255,255,1)';
+}
+
+// ── AJAX CATEGORY FILTERING ────────────────────────────–
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryBtns = document.querySelectorAll('.category-btn');
+    const isAdmin = {{ 'true' if session.get('role') == 'admin' else 'false' }};
+    
+    categoryBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const category = this.getAttribute('data-category') || null;
+            
+            // Update button states
+            categoryBtns.forEach(b => {
+                if (b.getAttribute('data-category') === this.getAttribute('data-category')) {
+                    b.classList.remove('btn-outline-secondary');
+                    b.classList.add('btn-warning');
+                } else {
+                    b.classList.remove('btn-warning');
+                    b.classList.add('btn-outline-secondary');
+                }
+            });
+            
+            // Show loading
+            document.getElementById('loading-indicator').style.display = 'block';
+            
+            // Fetch products
+            const url = category ? `/api/products?category=${encodeURIComponent(category)}` : '/api/products';
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    // Generate HTML for products
+                    let html = '';
+                    
+                    if (data.products.length === 0) {
+                        html = `<div class="text-center py-5">
+                                    <i class="bi bi-box-seam display-1 text-muted"></i>
+                                    <p class="text-muted mt-3">No products available in this category.</p>
+                                </div>`;
+                    } else {
+                        html = '<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">';
+                        
+                        data.products.forEach(product => {
+                            const images = product.images || [];
+                            const firstImage = images.length > 0 ? images[0].image_url : null;
+                            const discount = product.discount ? parseFloat(product.discount) : 0;
+                            const finalPrice = discount > 0 
+                                ? (product.price - (product.price * discount / 100)).toFixed(0)
+                                : product.price;
+                            
+                            html += `<div class="col">
+                                <div class="card product-card h-100">
+                                    <div class="product-image-carousel position-relative">`;
+                            
+                            if (firstImage) {
+                                html += `<div class="carousel-container" style="position: relative; width: 100%; height: 220px; overflow: hidden; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">`;
+                                
+                                images.forEach((img, idx) => {
+                                    html += `<img src="${img.image_url}" alt="${product.name}" 
+                                                class="carousel-image" 
+                                                style="width: 100%; height: 100%; object-fit: contain; ${idx === 0 ? 'display: block;' : 'display: none;'} position: absolute; top: 0; left: 0; cursor: pointer;"
+                                                onclick="openImageModal(this)">`;
+                                });
+                                
+                                html += `</div>`;
+                                
+                                if (images.length > 1) {
+                                    html += `<button class="btn btn-sm btn-light position-absolute start-0 top-50 translate-middle-y ms-2" 
+                                            onclick="previousImage(this)" 
+                                            style="z-index: 10; opacity: 0.8; transition: all 0.3s;"
+                                            onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'"
+                                            onmouseout="this.style.opacity='0.8'; this.style.transform='scale(1)'">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-light position-absolute end-0 top-50 translate-middle-y me-2" 
+                                            onclick="nextImage(this)" 
+                                            style="z-index: 10; opacity: 0.8; transition: all 0.3s;"
+                                            onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'"
+                                            onmouseout="this.style.opacity='0.8'; this.style.transform='scale(1)'">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                    <div class="carousel-dots position-absolute bottom-0 start-50 translate-middle-x pb-2 d-flex gap-2">`;
+                                    
+                                    images.forEach((img, idx) => {
+                                        html += `<span class="dot ${idx === 0 ? 'active' : ''}" 
+                                                onclick="changeImage(this)" 
+                                                style="width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,${idx === 0 ? '1' : '0.7'}); cursor: pointer; transition: all 0.3s; border: 2px solid white;"></span>`;
+                                    });
+                                    
+                                    html += `</div>`;
+                                }
+                            } else {
+                                html += `<div class="product-image-carousel position-relative" style="background: #e9ecef; min-height: 220px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #dee2e6;">
+                                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                    </div>`;
+                            }
+                            
+                            if (product.action) {
+                                html += `<span class="badge bg-danger position-absolute top-0 end-0 m-2">${product.action}</span>`;
+                            }
+                            
+                            html += `<a href="/product/${product.id}" class="stretched-link"></a>
+                                    </div>
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="card-title fw-semibold">${product.name}</h6>
+                                        <div class="mb-2">`;
+                            
+                            if (discount > 0) {
+                                html += `<p class="price mb-1">UGX ${parseInt(finalPrice).toLocaleString()}</p>
+                                        <small class="text-muted text-decoration-line-through">UGX ${parseInt(product.price).toLocaleString()}</small>
+                                        <span class="badge bg-danger ms-2">-${Math.round(discount)}%</span>`;
+                            } else {
+                                html += `<p class="price mb-0">UGX ${parseInt(product.price).toLocaleString()}</p>`;
+                            }
+                            
+                            html += `</div>
+                                        <p class="mb-2"><span class="badge bg-light text-dark small">${product.category}</span></p>`;
+                            
+                            if (isAdmin) {
+                                html += `<a href="/admin/product/${product.id}/edit" class="btn btn-warning btn-sm mt-auto">
+                                            <i class="bi bi-pencil-square me-1"></i>Edit Product
+                                        </a>`;
+                            } else if (product.stock > 0) {
+                                html += `<span class="badge bg-success mb-2" style="width:fit-content">In Stock</span>
+                                        <a href="/add_to_cart/${product.id}" class="btn btn-primary btn-sm mt-auto">
+                                            <i class="bi bi-cart-plus me-1"></i>Add to Cart
+                                        </a>`;
+                            } else {
+                                html += `<span class="badge bg-danger mb-2" style="width:fit-content">Out of Stock</span>
+                                        <button class="btn btn-secondary btn-sm mt-auto" disabled>Unavailable</button>`;
+                            }
+                            
+                            html += `</div>
+                                </div>
+                            </div>`;
+                        });
+                        
+                        html += '</div>';
+                    }
+                    
+                    // Update container with smooth fade
+                    const container = document.getElementById('products-container');
+                    container.style.opacity = '0';
+                    container.style.transition = 'opacity 0.3s ease';
+                    
+                    setTimeout(() => {
+                        container.innerHTML = html;
+                        container.style.opacity = '1';
+                    }, 150);
+                    
+                    // Hide loading
+                    document.getElementById('loading-indicator').style.display = 'none';
+                    
+                    // Scroll to products section smoothly
+                    document.getElementById('products').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('loading-indicator').style.display = 'none';
+                    alert('Error loading products. Please try again.');
+                });
+        });
+    });
+});
+</script>
+
+{% endblock %}

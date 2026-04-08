@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Add Product — Sky Baby Store{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3">
+        <div class="admin-sidebar rounded-3">
+            <p class="text-warning fw-bold mb-3">
+                <i class="bi bi-speedometer2 me-2"></i>Admin
+            </p>
+            <a href="{{ url_for('admin_dashboard') }}">
+                <i class="bi bi-grid me-2"></i>Dashboard
+            </a>
+            <a href="{{ url_for('admin_add_product') }}" class="active" style="background: rgba(255,255,255,0.1);">
+                <i class="bi bi-plus-circle me-2"></i>Add Product
+            </a>
+            <a href="{{ url_for('index') }}">
+                <i class="bi bi-shop me-2"></i>View Store
+            </a>
+        </div>
+    </div>
+
+    <!-- Form Content -->
+    <div class="col-md-9">
+        <div class="card border-0 shadow-sm rounded-3 p-4">
+            <div class="mb-4">
+                <h4 class="fw-bold mb-1">
+                    <i class="bi bi-plus-circle me-2 text-warning"></i>Add New Product
+                </h4>
+                <p class="text-muted small">Fill in the details below to add a new baby product to your store</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('admin_add_product') }}" enctype="multipart/form-data">
+                
+                <!-- Product Information -->
+                <div class="mb-4 pb-4 border-bottom">
+                    <h6 class="fw-bold text-muted mb-3">Product Information</h6>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Product Name *</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Baby Stroller" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Description</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Describe your product..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Pricing & Discounts -->
+                <div class="mb-4 pb-4 border-bottom">
+                    <h6 class="fw-bold text-muted mb-3">Pricing & Inventory</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Price (UGX) *</label>
+                            <input type="number" name="price" class="form-control" step="0.01" placeholder="50000" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Discount (%)</label>
+                            <input type="number" name="discount" class="form-control" step="0.01" min="0" max="100" placeholder="0" value="0">
+                            <small class="text-muted">Leave as 0 for no discount</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Stock Quantity *</label>
+                            <input type="number" name="stock" class="form-control" placeholder="10" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category & Action -->
+                <div class="mb-4 pb-4 border-bottom">
+                    <h6 class="fw-bold text-muted mb-3">Organization</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Category *</label>
+                            <select name="category" class="form-select" required>
+                                <option value="">Select a category...</option>
+                                <option value="Infant (0-6 Months)">Infant (0-6 Months)</option>
+                                <option value="Sitter/Crawler (6-12 Months)">Sitter/Crawler (6-12 Months)</option>
+                                <option value="Toddler (12-18+ Months)">Toddler (12-18+ Months)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Action Tag</label>
+                            <select name="action" class="form-select">
+                                <option value="">No tag</option>
+                                <option value="New Arrival">New Arrival</option>
+                                <option value="On Sale">On Sale</option>
+                                <option value="Bestseller">Bestseller</option>
+                                <option value="Limited Edition">Limited Edition</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Images -->
+                <div class="mb-4 pb-4 border-bottom">
+                    <h6 class="fw-bold text-muted mb-3">Product Images (up to 3)</h6>
+                    <p class="text-muted small mb-3">You can upload images or paste image URLs. Upload takes priority.</p>
+                    
+                    <!-- Image 1 -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Image 1</label>
+                        <input type="file" name="image_1" class="form-control mb-2" accept="image/*">
+                        <small class="text-muted d-block mb-2">OR paste URL:</small>
+                        <input type="url" name="image_url_1" class="form-control" placeholder="https://example.com/image1.jpg">
+                    </div>
+
+                    <!-- Image 2 -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Image 2 (Optional)</label>
+                        <input type="file" name="image_2" class="form-control mb-2" accept="image/*">
+                        <small class="text-muted d-block mb-2">OR paste URL:</small>
+                        <input type="url" name="image_url_2" class="form-control" placeholder="https://example.com/image2.jpg">
+                    </div>
+
+                    <!-- Image 3 -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Image 3 (Optional)</label>
+                        <input type="file" name="image_3" class="form-control mb-2" accept="image/*">
+                        <small class="text-muted d-block mb-2">OR paste URL:</small>
+                        <input type="url" name="image_url_3" class="form-control" placeholder="https://example.com/image3.jpg">
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-warning py-2 fw-bold flex-grow-1">
+                        <i class="bi bi-plus me-2"></i>Add Product
+                    </button>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary py-2 flex-grow-1">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

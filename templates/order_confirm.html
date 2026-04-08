@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Order Confirmed — Sky Baby Store{% endblock %}
+
+{% block content %}
+
+<div class="confirm-card">
+
+    <!-- Success Icon -->
+    <i class="bi bi-check-circle-fill confirm-icon"></i>
+    <h2 class="fw-bold mt-3">Order Confirmed!</h2>
+    <p class="text-muted">Thank you for your purchase. Your order #{{ order_id }} has been placed.</p>
+
+    <!-- Order Items -->
+    <div class="text-start mt-4">
+        <table class="table">
+            <thead class="table-light">
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item['name'] }}</td>
+                    <td>{{ item['quantity'] }}</td>
+                    <td>UGX {{ "{:,.0f}".format(item['price'] * item['quantity']) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-between fw-bold fs-5 px-2">
+            <span>Total Paid</span>
+            <span>UGX {{ "{:,.0f}".format(items[0]['total']) }}</span>
+        </div>
+    </div>
+
+    <button id="continueShoppingBtn" class="btn btn-warning mt-4 px-5 fw-bold">
+        <i class="bi bi-house me-2"></i>Continue Shopping
+    </button>
+</div>
+
+<script>
+// Handle Continue Shopping - replace history instead of regular redirect
+document.getElementById('continueShoppingBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // Clear the browser history to prevent back navigation
+    window.location.replace('{{ url_for("index") }}');
+});
+
+// Prevent back navigation by replacing the current state
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        // Page was restored from back/forward - redirect to home
+        window.location.replace('{{ url_for("index") }}');
+    }
+});
+
+// Add a handler to warn if user tries to navigate away
+window.addEventListener('popstate', function(e) {
+    e.preventDefault();
+    // Replace with home page if they try to go back
+    window.location.replace('{{ url_for("index") }}');
+});
+</script>
+
+{% endblock %}

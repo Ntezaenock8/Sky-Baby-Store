@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Checkout — Sky Baby Store{% endblock %}
+
+{% block content %}
+
+<h2 class="fw-bold mb-4">
+    <i class="bi bi-lock me-2"></i>Checkout
+</h2>
+
+<div class="row g-4">
+
+    <!-- Order Summary -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Order Summary</h5>
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item['name'] }}</td>
+                            <td>{{ item['quantity'] }}</td>
+                            <td>UGX {{ "{:,.0f}".format(item['price'] * item['quantity']) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between fw-bold fs-5 mt-2">
+                    <span>Total</span>
+                    <span>UGX {{ "{:,.0f}".format(total) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Panel -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Payment Method</h5>
+
+                <!-- Payment method options — UI only -->
+                <div class="d-flex flex-column gap-2 mb-4">
+                    <div class="border rounded-3 p-3 d-flex align-items-center gap-3 payment-option active-payment">
+                        <i class="bi bi-phone fs-4 text-warning"></i>
+                        <div>
+                            <div class="fw-semibold">MTN Mobile Money</div>
+                            <small class="text-muted">Pay via MTN MoMo</small>
+                        </div>
+                    </div>
+                    <div class="border rounded-3 p-3 d-flex align-items-center gap-3 payment-option">
+                        <i class="bi bi-credit-card fs-4 text-primary"></i>
+                        <div>
+                            <div class="fw-semibold">Visa / Mastercard</div>
+                            <small class="text-muted">Pay with card</small>
+                        </div>
+                    </div>
+                    <div class="border rounded-3 p-3 d-flex align-items-center gap-3 payment-option">
+                        <i class="bi bi-cash-stack fs-4 text-success"></i>
+                        <div>
+                            <div class="fw-semibold">Cash on Delivery</div>
+                            <small class="text-muted">Pay when delivered</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Place order form -->
+                <form method="POST" action="{{ url_for('place_order') }}">
+                    <button type="submit" class="btn btn-warning w-100 py-2 fw-bold">
+                        <i class="bi bi-bag-check me-2"></i>
+                        Place Order — UGX {{ "{:,.0f}".format(total) }}
+                    </button>
+                </form>
+
+                <p class="text-muted small text-center mt-3">
+                    <i class="bi bi-shield-lock me-1"></i>
+                    Your order is secured and protected
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

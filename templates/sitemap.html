@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% block title %}Sitemap — Sky Baby Store{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="text-center mb-5">
+    <h1 class="fw-bold"><i class="bi bi-diagram-3 me-2 text-warning"></i>Sitemap</h1>
+    <p class="text-muted">A full overview of all pages on Sky Baby Store.</p>
+</div>
+
+<div class="row g-4 justify-content-center">
+
+    <!-- Main Pages -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-header border-0 rounded-top-3 py-3" style="background: #1a1a2e;">
+                <h6 class="mb-0 fw-bold text-white">
+                    <i class="bi bi-house me-2 text-warning"></i>Main Pages
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0 sitemap-list">
+                    <li>
+                        <a href="{{ url_for('index') }}" class="sitemap-link">
+                            <i class="bi bi-house me-2"></i>Home
+                        </a>
+                        <ul class="list-unstyled ms-3 mt-1">
+                            <li class="text-muted small"><i class="bi bi-dot"></i>Product grid with category filters</li>
+                            <li class="text-muted small"><i class="bi bi-dot"></i>Deals &amp; promotions</li>
+                        </ul>
+                    </li>
+                    <li class="mt-2">
+                        <a href="{{ url_for('faq') }}" class="sitemap-link">
+                            <i class="bi bi-question-circle me-2"></i>FAQ
+                        </a>
+                        <ul class="list-unstyled ms-3 mt-1">
+                            <li class="text-muted small"><i class="bi bi-dot"></i>Orders &amp; Shopping</li>
+                            <li class="text-muted small"><i class="bi bi-dot"></i>Payment methods</li>
+                            <li class="text-muted small"><i class="bi bi-dot"></i>Delivery info</li>
+                            <li class="text-muted small"><i class="bi bi-dot"></i>Returns policy</li>
+                        </ul>
+                    </li>
+                    <li class="mt-2">
+                        <a href="{{ url_for('sitemap') }}" class="sitemap-link">
+                            <i class="bi bi-diagram-3 me-2"></i>Sitemap
+                        </a>
+                        <ul class="list-unstyled ms-3 mt-1">
+                            <li class="text-muted small"><i class="bi bi-dot"></i>This page</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Categories -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-header border-0 rounded-top-3 py-3" style="background: #1a1a2e;">
+                <h6 class="mb-0 fw-bold text-white">
+                    <i class="bi bi-grid me-2 text-warning"></i>Product Categories
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0 sitemap-list">
+                    <li>
+                        <a href="{{ url_for('index') }}" class="sitemap-link">
+                            <i class="bi bi-bag me-2"></i>All Products
+                        </a>
+                    </li>
+                    {% for cat in categories %}
+                    <li class="mt-2">
+                        <a href="{{ url_for('index') }}?category={{ cat['category'] | urlencode }}" class="sitemap-link">
+                            <i class="bi bi-tag me-2"></i>{{ cat['category'] }}
+                        </a>
+                        <ul class="list-unstyled ms-3 mt-1">
+                            <li class="text-muted small"><i class="bi bi-dot"></i>Browse &amp; filter by {{ cat['category'] }}</li>
+                            <li class="text-muted small"><i class="bi bi-dot"></i>Individual product details</li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="text-muted small">No categories found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account & Shopping Flow -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-header border-0 rounded-top-3 py-3" style="background: #1a1a2e;">
+                <h6 class="mb-0 fw-bold text-white">
+                    <i class="bi bi-person-circle me-2 text-warning"></i>Account &amp; Checkout
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0 sitemap-list">
+                    <li>
+                        <a href="{{ url_for('login') }}" class="sitemap-link">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </a>
+                    </li>
+                    <li class="mt-2">
+                        <a href="{{ url_for('register') }}" class="sitemap-link">
+                            <i class="bi bi-person-plus me-2"></i>Register
+                        </a>
+                    </li>
+                    <li class="mt-2">
+                        <a href="{{ url_for('cart') }}" class="sitemap-link">
+                            <i class="bi bi-cart3 me-2"></i>Shopping Cart
+                        </a>
+                        <ul class="list-unstyled ms-3 mt-1">
+                            <li class="text-muted small"><i class="bi bi-dot"></i>View &amp; edit cart items</li>
+                            <li class="text-muted small"><i class="bi bi-dot"></i>Adjust quantities</li>
+                        </ul>
+                    </li>
+                    <li class="mt-2">
+                        <a href="{{ url_for('checkout') }}" class="sitemap-link">
+                            <i class="bi bi-lock me-2"></i>Checkout
+                        </a>
+                        <ul class="list-unstyled ms-3 mt-1">
+                            <li class="text-muted small"><i class="bi bi-dot"></i>Order summary</li>
+                            <li class="text-muted small"><i class="bi bi-dot"></i>Payment selection</li>
+                            <li class="text-muted small"><i class="bi bi-dot"></i>Order confirmation</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /row -->
+
+<!-- Hierarchy Diagram -->
+<div class="mt-5">
+    <h5 class="fw-bold text-center mb-4">Website Hierarchy</h5>
+    <div class="d-flex justify-content-center">
+        <div class="sitemap-tree text-center">
+            <!-- Root -->
+            <div class="d-flex justify-content-center mb-2">
+                <div class="sitemap-node root-node">
+                    <i class="bi bi-balloon-heart-fill me-1 text-warning"></i>
+                    <strong>Sky Baby Store</strong>
+                </div>
+            </div>
+            <!-- Connector line -->
+            <div class="sitemap-line-down"></div>
+            <!-- Level 1 -->
+            <div class="d-flex justify-content-center gap-2 flex-wrap mb-0">
+                <div class="sitemap-branch">
+                    <div class="sitemap-line-up"></div>
+                    <div class="sitemap-node">
+                        <i class="bi bi-house me-1"></i>Home
+                    </div>
+                    <div class="sitemap-line-down"></div>
+                    <!-- Level 2 children -->
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <div class="sitemap-branch">
+                            <div class="sitemap-line-up"></div>
+                            <div class="sitemap-node leaf-node">
+                                <i class="bi bi-grid me-1"></i>Products
+                            </div>
+                        </div>
+                        <div class="sitemap-branch">
+                            <div class="sitemap-line-up"></div>
+                            <div class="sitemap-node leaf-node">
+                                <i class="bi bi-box me-1"></i>Product Detail
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sitemap-branch">
+                    <div class="sitemap-line-up"></div>
+                    <div class="sitemap-node">
+                        <i class="bi bi-cart3 me-1"></i>Cart
+                    </div>
+                    <div class="sitemap-line-down"></div>
+                    <div class="d-flex justify-content-center">
+                        <div class="sitemap-branch">
+                            <div class="sitemap-line-up"></div>
+                            <div class="sitemap-node leaf-node">
+                                <i class="bi bi-lock me-1"></i>Checkout
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sitemap-branch">
+                    <div class="sitemap-line-up"></div>
+                    <div class="sitemap-node">
+                        <i class="bi bi-person me-1"></i>Account
+                    </div>
+                    <div class="sitemap-line-down"></div>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <div class="sitemap-branch">
+                            <div class="sitemap-line-up"></div>
+                            <div class="sitemap-node leaf-node">Login</div>
+                        </div>
+                        <div class="sitemap-branch">
+                            <div class="sitemap-line-up"></div>
+                            <div class="sitemap-node leaf-node">Register</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sitemap-branch">
+                    <div class="sitemap-line-up"></div>
+                    <div class="sitemap-node leaf-node">
+                        <i class="bi bi-question-circle me-1"></i>FAQ
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
