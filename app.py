@@ -280,20 +280,6 @@ def logout():
     user_id = session.get('user_id', None)
     session.clear()
     
-    # Log logout action
-    if user_id:
-        db = get_db()
-        cursor = db.cursor()
-        try:
-            cursor.execute("""
-                INSERT INTO audit_log (user_id, action, timestamp)
-                VALUES (%s, %s, NOW())
-            """, (user_id, 'logout'))
-            db.commit()
-        except:
-            pass  # Audit log table might not exist, continue anyway
-        db.close()
-    
     flash(f'{user_name}, you have been logged out successfully.', 'info')
     
     # Create response and clear auth token

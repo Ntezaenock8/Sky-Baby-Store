@@ -1,4 +1,4 @@
--- Sky Baby Store - Full Database Schema
+﻿-- Sky Baby Store - Full Database Schema
 -- Reflects the current live PostgreSQL database structure.
 -- Run this on a fresh database to recreate everything from scratch.
 
@@ -63,10 +63,3 @@ CREATE TABLE IF NOT EXISTS cart (
     UNIQUE(user_id, product_id)
 );
 
--- AUDIT LOG
-CREATE TABLE IF NOT EXISTS audit_log (
-    id         SERIAL PRIMARY KEY,
-    user_id    INTEGER   REFERENCES users(id),
-    action     TEXT      NOT NULL,
-    timestamp  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
