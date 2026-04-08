@@ -1,10 +1,8 @@
--- ─────────────────────────────────────────────────────────────
---  Sky Baby Store — Full Database Schema
---  Reflects the current live PostgreSQL database structure.
---  Run this on a fresh database to recreate everything from scratch.
--- ─────────────────────────────────────────────────────────────
+-- Sky Baby Store - Full Database Schema
+-- Reflects the current live PostgreSQL database structure.
+-- Run this on a fresh database to recreate everything from scratch.
 
--- ── USERS ────────────────────────────────────────────────────
+-- USERS
 CREATE TABLE IF NOT EXISTS users (
     id          SERIAL PRIMARY KEY,
     name        VARCHAR(100)        NOT NULL,
@@ -14,21 +12,20 @@ CREATE TABLE IF NOT EXISTS users (
     created_at  TIMESTAMP           DEFAULT CURRENT_TIMESTAMP
 );
 
--- ── PRODUCTS ─────────────────────────────────────────────────
+-- PRODUCTS
 CREATE TABLE IF NOT EXISTS products (
     id          SERIAL PRIMARY KEY,
     name        VARCHAR(200)        NOT NULL,
     description TEXT,
     price       NUMERIC(10,2)       NOT NULL,
     stock       INTEGER             DEFAULT 0,
-    image_url   TEXT,                          -- legacy single-image field (kept for backwards compat)
+    image_url   TEXT,
     category    VARCHAR(100),
-    discount    DECIMAL(5,2)        DEFAULT 0, -- percentage discount e.g. 10 = 10%
-    action      VARCHAR(50)                    -- badge label e.g. "New", "Sale"
+    discount    DECIMAL(5,2)        DEFAULT 0,
+    action      VARCHAR(50)
 );
 
--- ── PRODUCT IMAGES ───────────────────────────────────────────
--- Supports up to 3 images per product, ordered by image_order.
+-- PRODUCT IMAGES
 CREATE TABLE IF NOT EXISTS product_images (
     id          SERIAL PRIMARY KEY,
     product_id  INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -39,7 +36,7 @@ CREATE TABLE IF NOT EXISTS product_images (
 
 CREATE INDEX IF NOT EXISTS idx_product_images_product_id ON product_images(product_id);
 
--- ── ORDERS ───────────────────────────────────────────────────
+-- ORDERS
 CREATE TABLE IF NOT EXISTS orders (
     id          SERIAL PRIMARY KEY,
     user_id     INTEGER       REFERENCES users(id),
@@ -48,7 +45,7 @@ CREATE TABLE IF NOT EXISTS orders (
     created_at  TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
 );
 
--- ── ORDER ITEMS ──────────────────────────────────────────────
+-- ORDER ITEMS
 CREATE TABLE IF NOT EXISTS order_items (
     id          SERIAL PRIMARY KEY,
     order_id    INTEGER       REFERENCES orders(id),
@@ -57,8 +54,7 @@ CREATE TABLE IF NOT EXISTS order_items (
     price       NUMERIC(10,2) NOT NULL
 );
 
--- ── CART ─────────────────────────────────────────────────────
--- Persists logged-in users' carts between sessions.
+-- CART
 CREATE TABLE IF NOT EXISTS cart (
     id          SERIAL PRIMARY KEY,
     user_id     INTEGER REFERENCES users(id),
@@ -67,7 +63,7 @@ CREATE TABLE IF NOT EXISTS cart (
     UNIQUE(user_id, product_id)
 );
 
--- ── AUDIT LOG ────────────────────────────────────────────────
+-- AUDIT LOG
 CREATE TABLE IF NOT EXISTS audit_log (
     id         SERIAL PRIMARY KEY,
     user_id    INTEGER   REFERENCES users(id),
