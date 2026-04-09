@@ -31,7 +31,7 @@ try:
     _db = get_db()
     _cur = _db.cursor()
     _schema = os.path.join(os.path.dirname(__file__), 'schema.sql')
-    with open(_schema) as _f:
+    with open(_schema, encoding='utf-8-sig') as _f:
         _cur.execute(_f.read())
     _db.commit()
     _cur.close()
