@@ -25,6 +25,21 @@ app.secret_key = SECRET_KEY
 # Token serializer for creating secure tokens
 serializer = URLSafeTimedSerializer(SECRET_KEY)
 
+# ─── DB INIT ──────────────────────────────────────────
+# Runs on every startup — CREATE TABLE IF NOT EXISTS is safe to repeat
+try:
+    _db = get_db()
+    _cur = _db.cursor()
+    _schema = os.path.join(os.path.dirname(__file__), 'schema.sql')
+    with open(_schema) as _f:
+        _cur.execute(_f.read())
+    _db.commit()
+    _cur.close()
+    _db.close()
+    print("DB schema ready.")
+except Exception as _e:
+    print(f"DB init warning: {_e}")
+
 # ─── TOKEN UTILITIES ──────────────────────────────────
 
 def generate_auth_token(user_id):

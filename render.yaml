@@ -3,7 +3,7 @@ services:
     name: sky-baby-store
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python init_db.py && gunicorn app:app
+    startCommand: gunicorn app:app
     plan: free
     envVars:
       - key: DATABASE_URL
