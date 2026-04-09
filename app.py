@@ -30,9 +30,19 @@ serializer = URLSafeTimedSerializer(SECRET_KEY)
 _db = get_db()
 _db.autocommit = True
 _cur = _db.cursor()
-_schema = os.path.join(os.path.dirname(__file__), 'schema.sql')
-with open(_schema, encoding='utf-8-sig') as _f:
+_base = os.path.dirname(__file__)
+
+# Always run schema first (creates tables if missing)
+with open(os.path.join(_base, 'schema.sql'), encoding='utf-8-sig') as _f:
     _cur.execute(_f.read())
+
+# Load seed data once if the file exists (one-time migration)
+_seed = os.path.join(_base, 'seed_data.sql')
+if os.path.exists(_seed):
+    with open(_seed, encoding='utf-8') as _f:
+        _cur.execute(_f.read())
+    print("DB seed data loaded.")
+
 _cur.close()
 _db.close()
 print("DB schema ready.")
