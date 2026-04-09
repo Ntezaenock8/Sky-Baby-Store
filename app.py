@@ -27,25 +27,34 @@ serializer = URLSafeTimedSerializer(SECRET_KEY)
 
 # ─── DB INIT ──────────────────────────────────────────
 # Runs on every startup — CREATE TABLE IF NOT EXISTS is safe to repeat
-_db = get_db()
-_db.autocommit = True
-_cur = _db.cursor()
-_base = os.path.dirname(__file__)
+try:
+    _db = get_db()
+    _db.autocommit = True
+    _cur = _db.cursor()
+    _base = os.path.dirname(__file__)
 
-# Always run schema first (creates tables if missing)
-with open(os.path.join(_base, 'schema.sql'), encoding='utf-8-sig') as _f:
-    _cur.execute(_f.read())
+    # Always run schema first (creates tables if missing)
+    with open(os.path.join(_base, 'schema.sql'), encoding='utf-8-sig') as _f:
+        for _stmt in _f.read().split(';'):
+            _stmt = _stmt.strip()
+            if _stmt:
+                _cur.execute(_stmt)
 
-# Load seed data once if the file exists (one-time migration)
-_seed = os.path.join(_base, 'seed_data.sql')
-if os.path.exists(_seed):
-    with open(_seed, encoding='utf-8') as _f:
-        _cur.execute(_f.read())
-    print("DB seed data loaded.")
+    # Load seed data once if the file exists (one-time migration)
+    _seed = os.path.join(_base, 'seed_data.sql')
+    if os.path.exists(_seed):
+        with open(_seed, encoding='utf-8') as _f:
+            for _stmt in _f.read().split(';'):
+                _stmt = _stmt.strip()
+                if _stmt:
+                    _cur.execute(_stmt)
+        print("DB seed data loaded.")
 
-_cur.close()
-_db.close()
-print("DB schema ready.")
+    _cur.close()
+    _db.close()
+    print("DB schema ready.")
+except Exception as _e:
+    print(f"DB init error: {_e}")
 
 # ─── TOKEN UTILITIES ──────────────────────────────────
 
