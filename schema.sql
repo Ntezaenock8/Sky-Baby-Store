@@ -63,3 +63,8 @@ CREATE TABLE IF NOT EXISTS cart (
     UNIQUE(user_id, product_id)
 );
 
+-- DEFAULT ADMIN USER (password: admin123)
+INSERT INTO users (name, email, password, role)
+VALUES ('Admin', 'admin@store.com', '$2b$12$BNjrANdMxw9qlPCZyfWo9uKbCKgc0GhWz.Xj3mCT1OXxu4Y2v47RK', 'admin')
+ON CONFLICT (email) DO NOTHING;
+
